@@ -1,30 +1,35 @@
 // Models
-import repoUsersModel from './model';
+import CommitsModel from './model';
+import FoldersModel from '../folders/model';
 
-export default class RepoUsersActions {
+export default class FoldersActions {
 
-  async login (req, res) {
+  async commitsByFolderAndUser (req, res) {
     try {
-      const user = await repoUsersModel.findOne({username : req.body.username, password : req.body.password});
-      if (user) {
-        res.created(false, user, 'User logged successfully');
+      const exist = await CommitsModel.find({repoUserId : req.body.repoUserId, folderName : req.body.folderName });
+      if (exist) {
+        res.created(false, exist, 'Commits found successfully');
       } else {
-        res.created(true, null, 'Username or password incorrect');
+        res.created(true, false, 'Commits not found');
       }
-      res.ok(null, user, 'User logged in');
     } catch (err) {
-      res.badRequest(err, null, 'Error loggin in');
+      res.badRequest(err, null, 'Error creating document');
     }
   }
 
-  async createUser (req, res) {
+  async addCommit (req, res) {
     try {
-      const exist = await repoUsersModel.findOne({username : req.body.username});
-      if (exist) {
-        res.created(true, exist, 'This username already exist');
+      const folder = await FoldersModel.findOne({folderName : req.body.folderName });
+      if (folder) {
+        const newCommit = new CommitsModel({
+          message    : req.body.message,
+          repoUserId : req.body.repoUserId,
+          folderId   : folder._id,
+        });
+        await newCommit.save();
+        res.created(false, newCommit, 'Commit created successfully');
       } else {
-        const newUser = await repoUsersModel.create(req.body);
-        res.created(false, newUser, 'User successfully created');
+        res.created(true, false, 'Folder name not found successfully');
       }
     } catch (err) {
       res.badRequest(err, null, 'Error creating document');
