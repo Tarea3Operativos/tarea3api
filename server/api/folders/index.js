@@ -6,7 +6,8 @@ const actions = new Actions();
 
 // GET Methods
 router.get('/foldersByUser/:id', actions.foldersByUser);
-router.get('/validatePermission/name/_id', actions.validatePermission);
+router.get('/getFolders', actions.getFolders);
+router.get('/validatePermission/:name/:username', actions.validatePermission);
 
 // POST Methods
 router.post('/addFolder', actions.addFolder);

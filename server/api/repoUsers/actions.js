@@ -17,6 +17,19 @@ export default class RepoUsersActions {
     }
   }
 
+  async getUsers (req, res) {
+    try {
+      const users = await repoUsersModel.find();
+      if (users) {
+        res.created(false, users.map(user => user.username), 'Users');
+      } else {
+        res.created(true, null, 'Not Users');
+      }
+    } catch (err) {
+      res.badRequest(err, null, 'Error loggin in');
+    }
+  }
+
   async createUser (req, res) {
     try {
       const exist = await repoUsersModel.findOne({username : req.body.username});
